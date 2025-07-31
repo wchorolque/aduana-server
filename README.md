@@ -3,16 +3,16 @@ con la info necesario para realizar una nueva importación
 
 ## Parámetros
 
-### --consignatario c
+### --consignatario c (opcional)
 Numero de identificación Tributaria del Consignatario de la carga
 
-### --proveedor p
+### --proveedor p (opcional)
 Código del Proveedor si se conoce o algun string de busqueda
 
-### --nombre n
-Nombre del archivo de liquidacion
+### --nombre n (requerido)
+Nombre del archivo y del directorio de liquidacion
 
-### --ruta r
+### --ruta r (opcional por defecto el directorio actual)
 Crear directorio en la ruta especificada o en la actual ruta en caso de
 no ser proporcionado ninguna ruta y crear subdirectorios de trabajo
 
@@ -30,6 +30,10 @@ no ser proporcionado ninguna ruta y crear subdirectorios de trabajo
 
 ## Actvidades a realizar
 - [ ] Crear Directorios
+  - Determinar si se ingreso el la ruta del directorio base
+  - Si no se proporciona usar el directorio actual
+    - Crear el directorio base
+    - Dentro el directorio base crear los directorio (actas y pagos, aforo, docs, formularios, info, memorizado)
 - [ ] Copiar Archivo DAV
 - [ ] Copiar Archivo DAM
 - [ ] Buscar Consignatario localmente
