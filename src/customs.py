@@ -23,57 +23,67 @@ def start_project(consignatario, proveedor, ruta, project_name):
     except Exception as e:
         click.echo(e)
 
-    directorio_trabajo = directorio_padre.resolve() / project_name
+    directorio_de_trabajo = directorio_padre.resolve() / project_name
     click.echo(f"{consignatario} {proveedor} {project_name}")
-    click.echo(directorio_trabajo)
+    crear_directorios_de_trabajo(directorio_de_trabajo)
+    copiar_plantillas_de_trabajo(directorio_de_trabajo, project_name)
 
-    if directorio_trabajo.exists():
-        click.echo(f'El directorio {directorio_trabajo} ya existe')
+
+
+def crear_directorios_de_trabajo(directorio_de_trabajo):
+    """Crea la estructura del directorio de trabajo"""
+    click.echo(directorio_de_trabajo)
+    if directorio_de_trabajo.exists():
+        click.echo(f'El directorio {directorio_de_trabajo} ya existe')
     else:
-        respuesta = click.prompt(f"Se creará el directorio [{directorio_trabajo}] desea constinuar? (Y/N): ")
+        respuesta = click.prompt(f"Se creará el directorio [{directorio_de_trabajo}] desea constinuar? (Y/N): ")
         if "Y"== respuesta.upper():
-            directorio_trabajo.mkdir(parents=True)
-            click.echo(f"Creado Directorio de trabajo [{directorio_trabajo}]")
-            actas = directorio_trabajo / "actas y pagos"
+            directorio_de_trabajo.mkdir(parents=True)
+            click.echo(f"Creado Directorio de trabajo [{directorio_de_trabajo}]")
+            actas = directorio_de_trabajo / "actas y pagos"
             actas.mkdir()
             click.echo (f"Creado el directorio [{actas}]")
-            aforo = directorio_trabajo / "aforo"
+            aforo = directorio_de_trabajo / "aforo"
             aforo.mkdir()
             click.echo (f"Creado el directorio [{aforo}]")
-            docs = directorio_trabajo / "docs"
+            docs = directorio_de_trabajo / "docs"
             docs.mkdir()
             click.echo (f"Creado el directorio [{docs}]")
-            formularios = directorio_trabajo / "formularios"
+            formularios = directorio_de_trabajo / "formularios"
             formularios.mkdir()
             click.echo (f"Creado el directorio [{formularios}]")
-            info = directorio_trabajo / "info"
+            info = directorio_de_trabajo / "info"
             info.mkdir()
             click.echo (f"Creado el directorio [{info}]")
-            memorizado = directorio_trabajo / "memorizado"
+            memorizado = directorio_de_trabajo / "memorizado"
             memorizado.mkdir()
             click.echo (f"Creado el directorio [{memorizado}]")
 
+
+def copiar_plantillas_de_trabajo(directorio_de_trabajo, project_name):
+    """ Copia los archivos plantilla de liquidacion, dav y dam"""
     templates_dir_path = Path(__file__).parent / 'templates'
+    # Definir las rutas origen de las plantillas
     ods_template = templates_dir_path / 'template.ods'
     dam_template = templates_dir_path / 'DAMv2-11.xlsm'
     dav_template = templates_dir_path / 'DAV.xlsm'
-    if directorio_trabajo.exists():
+    if directorio_de_trabajo.exists():
+        # Si el directorio de trabajo existe copiar los archivos a su destino
         try:
             if ods_template.exists():
-                path_ods_filename = directorio_trabajo / f"{project_name}.ods"
+                path_ods_filename = directorio_de_trabajo / f"{project_name}.ods"
                 shutil.copy(ods_template, path_ods_filename)
                 click.echo(f"Copiando Plantilla de trabajo [{ods_template}] -> [{path_ods_filename}]")
             if dam_template.exists():
-                path_to_dam = directorio_trabajo / "formularios/DAMv2-11.xlsm"
+                path_to_dam = directorio_de_trabajo / "formularios/DAMv2-11.xlsm"
                 shutil.copy(dam_template, path_to_dam)
                 click.echo(f"Copiando Plantilla de DAM [{dam_template}] -> [{path_to_dam}]")
             if dav_template.exists():
-                path_to_dav = directorio_trabajo / "formularios/DAV.xlsm"
+                path_to_dav = directorio_de_trabajo / "formularios/DAV.xlsm"
                 shutil.copy(dav_template, path_to_dav)
                 click.echo(f"Copiando Plantilla de DAV [{dav_template}] -> [{path_to_dav}]")
         except Exception as e:
             click.echo(e)
-
 
 
 if __name__ == '__main__':
