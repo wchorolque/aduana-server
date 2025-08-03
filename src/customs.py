@@ -1,7 +1,9 @@
 #!/usr/bin/env python
-from http.cookiejar import uppercase_escaped_char
 from pathlib import Path
+
+from odfdo import Document
 import shutil
+
 import click
 
 @click.group()
@@ -27,7 +29,7 @@ def start_project(consignatario, proveedor, ruta, project_name):
     click.echo(f"{consignatario} {proveedor} {project_name}")
     crear_directorios_de_trabajo(directorio_de_trabajo)
     copiar_plantillas_de_trabajo(directorio_de_trabajo, project_name)
-
+    buscar_consignatario(directorio_de_trabajo, project_name, consignatario)
 
 
 def crear_directorios_de_trabajo(directorio_de_trabajo):
@@ -65,13 +67,13 @@ def copiar_plantillas_de_trabajo(directorio_de_trabajo, project_name):
     templates_dir_path = Path(__file__).parent / 'templates'
     # Definir las rutas origen de las plantillas
     ods_template = templates_dir_path / 'template.ods'
+    path_ods_filename = directorio_de_trabajo / f"{project_name}.ods"
     dam_template = templates_dir_path / 'DAMv2-11.xlsm'
     dav_template = templates_dir_path / 'DAV.xlsm'
     if directorio_de_trabajo.exists():
         # Si el directorio de trabajo existe copiar los archivos a su destino
         try:
             if ods_template.exists():
-                path_ods_filename = directorio_de_trabajo / f"{project_name}.ods"
                 shutil.copy(ods_template, path_ods_filename)
                 click.echo(f"Copiando Plantilla de trabajo [{ods_template}] -> [{path_ods_filename}]")
             if dam_template.exists():
@@ -84,6 +86,36 @@ def copiar_plantillas_de_trabajo(directorio_de_trabajo, project_name):
                 click.echo(f"Copiando Plantilla de DAV [{dav_template}] -> [{path_to_dav}]")
         except Exception as e:
             click.echo(e)
+
+
+def buscar_consignatario(directorio_de_trabajo, nombre_del_proyecto, consignatario):
+    # C2: Interno  E2: Referencia
+    # G2, F4: Numero NIT
+    # B4: razon social
+    # E4: Tipo Documento (CI, NIT, PASAPORTE, RIN, RUN)
+    # G4: Lugar (Departamento)
+    # H4 Nivel Comercial (01 Mayorista, 02 Minorista, 03 Usuario Industrial, 04 Usuario Final, 05 Otro)
+    # D6: Dirección
+    # F6: Ciudad
+    # H6: Pais
+    # B8: Telefono
+    # D8: Fax
+    # F8: Correo Electronico
+    # B10: Apellidos y Nombres
+    # E10: Carnet o Documento de quien firma
+    # G10: Observaciones
+    ods_filename = directorio_de_trabajo / f"{nombre_del_proyecto}.ods"
+    if ods_filename.exists():
+        r = click.prompt("Se va a sobreescribir el archivo de trabajo desea continuar? (Y/N): ")
+        if 'Y' == r.upper():
+            doc = Document(ods_filename)
+            sheet = doc.body.get_table(0)
+            style = sheet.get_cell("G2").style
+            sheet.set_value("G2", consignatario, style=style)
+            doc.save(ods_filename)
+    else:
+        click.echo(f"No existe el archivo {ods_filename}")
+
 
 
 if __name__ == '__main__':
