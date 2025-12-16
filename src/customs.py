@@ -28,8 +28,12 @@ def start_project(consignatario, proveedor, ruta, project_name):
     directorio_de_trabajo = directorio_padre.resolve() / project_name
     click.echo(f"{consignatario} {proveedor} {project_name}")
     crear_directorios_de_trabajo(directorio_de_trabajo)
-    copiar_plantillas_de_trabajo(directorio_de_trabajo, project_name)
-    buscar_consignatario(directorio_de_trabajo, project_name, consignatario)
+    respuesta = click.prompt(f"¿Desea copiar las plantillas de trabajo? (Y/N): ")
+    if 'y' == respuesta.lower():
+        copiar_plantillas_de_trabajo(directorio_de_trabajo, project_name)
+    respuesta = click.prompt(f"¿Desea asignar el consignatario? (Y/N): ")
+    if 'y' == respuesta.lower():
+        buscar_consignatario(directorio_de_trabajo, project_name, consignatario)
 
 
 def crear_directorios_de_trabajo(directorio_de_trabajo):
